@@ -14,7 +14,7 @@ const persistConfig = {
 }
 
 const combinedReducers = combineReducers({
-  personages: {},
+  passengers: {},
 })
 
 const rootReducer = (state, action) => {
