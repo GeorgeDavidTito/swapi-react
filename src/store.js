@@ -6,6 +6,7 @@ import localForage from 'localforage'
 /**
  * Reducers
  */
+import passengers from './slices/passengersSlice'
 
 const persistConfig = {
   key: 'root',
@@ -14,17 +15,10 @@ const persistConfig = {
 }
 
 const combinedReducers = combineReducers({
-  passengers: {},
+  passengers: passengers,
 })
 
-const rootReducer = (state, action) => {
-  if (action.type === 'auth/logout') {
-    state = undefined
-    localForage.clear()
-  }
-
-  return combinedReducers(state, action)
-}
+const rootReducer = (state, action) => combinedReducers(state, action)
 
 const persistedReducer = persistReducer(persistConfig, rootReducer)
 
@@ -34,19 +28,8 @@ const customizedMiddleware = getDefaultMiddleware({
   },
 })
 
-const ignoreActionsAfterLogOutMiddleware = (store) => (next) => (action) => {
-  const authorizedAnonymousActions = ['persist/', 'loader/']
-  if (
-    authorizedAnonymousActions.some((authorized) =>
-      action.type.includes(authorized)
-    )
-  ) {
-    next(action)
-  }
-}
-
 export const store = configureStore({
   reducer: persistedReducer,
-  middleware: customizedMiddleware.concat(ignoreActionsAfterLogOutMiddleware),
+  middleware: customizedMiddleware,
 })
 export const persistor = persistStore(store)
