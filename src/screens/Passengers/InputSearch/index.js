@@ -2,12 +2,15 @@ import React, { useState } from 'react'
 import styled from 'styled-components'
 import Button from '../../../components/ui/Button'
 import { VARIANTS } from '../../../components/ui/Button/constants'
+import { filter } from '../../../slices/passengersSlice'
+import { useDispatch } from 'react-redux'
 
-const InputSearch = ({ filterAction }) => {
-  const [filter, setFilter] = useState('')
+const InputSearch = () => {
+  const [search, setSearch] = useState('')
+  const dispatch = useDispatch()
 
   const handleSearch = () => {
-    filterAction(filter?.toLowerCase())
+    dispatch(filter(search?.toLowerCase()))
   }
 
   return (
@@ -15,8 +18,8 @@ const InputSearch = ({ filterAction }) => {
       <Input
         type="text"
         placeholder="Buscar por nombre"
-        value={filter}
-        onChange={(e) => setFilter(e.target.value)}
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
       />
       <Button variant={VARIANTS.PRIMARY} onClick={handleSearch}>
         Buscar

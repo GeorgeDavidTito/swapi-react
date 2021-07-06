@@ -8,7 +8,6 @@ const INITIAL_STATE = {
   nextPage: null,
   currenPage: 0,
   total: 0,
-  loadingMore: false,
   loading: false,
   error: false,
 }
@@ -19,17 +18,14 @@ const slice = createSlice({
   reducers: {
     fetchResultsStart: (state, { payload }) => {
       state.loading = payload.page > 1 ? false : true
-      state.loadingMore = payload.page > 1 ? true : false
       state.error = null
     },
     fetchResultsFailed: (state, { payload }) => {
       state.loading = false
-      state.loadingMore = false
       state.error = payload
     },
     fetchResultsSuccess: (state, { payload }) => {
       state.loading = false
-      state.loadingMore = false
       state.error = null
       state.results =
         state.results === null || payload.page === 1
@@ -51,6 +47,21 @@ const slice = createSlice({
     showAll: (state) => {
       state.filter = state.results
     },
+    removeItemStart: () => {},
+    removeItemFailed: (state, { payload }) => {
+      state.loading = false
+      state.error = payload
+    },
+    removeItemSuccess: (state, { payload }) => {
+      state.loading = false
+      state.error = null
+      state.results = state.results?.filter(
+        (passenger) => passenger.name?.toLowerCase() !== payload
+      )
+      state.filter = state.results?.filter(
+        (passenger) => passenger.name?.toLowerCase() !== payload
+      )
+    },
   },
 })
 
@@ -60,6 +71,9 @@ export const {
   fetchResultsSuccess,
   showFilter,
   showAll,
+  removeItemStart,
+  removeItemFailed,
+  removeItemSuccess,
 } = slice.actions
 
 export default slice.reducer
@@ -96,7 +110,14 @@ export const fetchPassengers =
     }
   }
 
-export const removeItem = (item) => {}
+export const removeItem = (item) => async (dispatch) => {
+  dispatch(removeItemStart())
+  try {
+    dispatch(removeItemSuccess(item))
+  } catch {
+    dispatch(removeItemFailed(`Hubo un error al eliminar el item ${item}.`))
+  }
+}
 
 export const filter = (item) => async (dispatch, getState) => {
   item !== '' ? dispatch(showFilter(item)) : dispatch(showAll(item))

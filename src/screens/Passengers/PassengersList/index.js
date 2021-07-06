@@ -7,8 +7,6 @@ import {
   selectPassengersError,
   selectPassengersLoading,
   fetchPassengers,
-  removeItem,
-  filter,
 } from '../../../slices/passengersSlice'
 import LoadingSpinner from '../../../components/LoadingSpinner'
 import Error from '../../../components/ui/ErrorComponent'
@@ -25,17 +23,7 @@ const PassengersList = () => {
     dispatch(fetchPassengers(1))
   }, [dispatch])
 
-  const handleRemove = (item) => {
-    console.log('item', item?.name)
-  }
-
-  const handleFilter = (search) => {
-    dispatch(filter(search))
-  }
-
-  const renderRow = (item) => (
-    <Passenger key={item.name} item={item} removeAction={handleRemove} />
-  )
+  const renderRow = (item) => <Passenger key={item.name} item={item} />
 
   if (loading) {
     return <LoadingSpinner>Cargando resultados</LoadingSpinner>
@@ -47,7 +35,7 @@ const PassengersList = () => {
 
   return (
     <Container>
-      {data && <InputSearch filterAction={handleFilter} />}
+      {data && <InputSearch />}
       {data?.map(renderRow)}
       {error && <Error message={error} />}
       {data?.length === 0 && (

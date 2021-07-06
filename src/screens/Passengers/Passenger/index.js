@@ -2,8 +2,15 @@ import React from 'react'
 import styled, { css } from 'styled-components'
 import Button from '../../../components/ui/Button'
 import { VARIANTS } from '../../../components/ui/Button/constants'
+import { removeItem } from '../../../slices/passengersSlice'
+import { useDispatch } from 'react-redux'
 
 const Passenger = ({ item, removeAction }) => {
+  const dispatch = useDispatch()
+
+  const handleRemove = () => {
+    dispatch(removeItem(item.name.toLowerCase()))
+  }
   return (
     <Row key={item.name}>
       <LeftPanel>
@@ -21,7 +28,7 @@ const Passenger = ({ item, removeAction }) => {
       </LeftPanel>
       <RightPanel>
         <Column>
-          <Button variant={VARIANTS.PRIMARY} onClick={() => removeAction(item)}>
+          <Button variant={VARIANTS.PRIMARY} onClick={handleRemove}>
             Eliminar
           </Button>
         </Column>
