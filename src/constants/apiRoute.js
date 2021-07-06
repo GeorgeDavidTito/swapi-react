@@ -1,3 +1,3 @@
 export default {
-  url: ': https://swapi.dev/api/',
+  url: 'https://swapi.dev/api/',
 }
