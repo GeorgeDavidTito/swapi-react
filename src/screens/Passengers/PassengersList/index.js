@@ -1,9 +1,9 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import styled from 'styled-components'
 
 import {
-  selectPassengersFilter,
+  selectPassengers,
   selectPassengersError,
   selectPassengersLoading,
   fetchPassengers,
@@ -16,8 +16,15 @@ import InputSearch from '../InputSearch'
 const PassengersList = () => {
   const loading = useSelector(selectPassengersLoading)
   const error = useSelector(selectPassengersError)
-  const data = useSelector(selectPassengersFilter)
+  const iData = useSelector(selectPassengers)
   const dispatch = useDispatch()
+  const [search, setSearch] = useState('')
+  const data =
+    search === ''
+      ? iData
+      : iData?.filter((passenger) =>
+          passenger?.name?.toLowerCase()?.includes(search)
+        )
 
   useEffect(() => {
     dispatch(fetchPassengers(1))
@@ -35,7 +42,7 @@ const PassengersList = () => {
 
   return (
     <Container>
-      {data && <InputSearch />}
+      {data && <InputSearch onSearch={setSearch} />}
       {data?.map(renderRow)}
       {error && <Error message={error} />}
       {data?.length === 0 && (

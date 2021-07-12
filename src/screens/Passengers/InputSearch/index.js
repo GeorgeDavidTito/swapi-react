@@ -2,15 +2,12 @@ import React, { useState } from 'react'
 import styled from 'styled-components'
 import Button from '../../../components/ui/Button'
 import { VARIANTS } from '../../../components/ui/Button/constants'
-import { filter } from '../../../slices/passengersSlice'
-import { useDispatch } from 'react-redux'
 
-const InputSearch = () => {
+const InputSearch = ({ onSearch }) => {
   const [search, setSearch] = useState('')
-  const dispatch = useDispatch()
 
   const handleSearch = () => {
-    dispatch(filter(search?.toLowerCase()))
+    onSearch(search?.toLowerCase())
   }
 
   return (

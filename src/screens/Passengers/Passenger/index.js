@@ -3,14 +3,18 @@ import styled, { css } from 'styled-components'
 import Button from '../../../components/ui/Button'
 import { VARIANTS } from '../../../components/ui/Button/constants'
 import { removeItem } from '../../../slices/passengersSlice'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
+import { selectRemoveItemLoading } from '../../../slices/passengersSlice'
+import LoadingSpinner from '../../../components/LoadingSpinner'
 
-const Passenger = ({ item, removeAction }) => {
+const Passenger = ({ item }) => {
   const dispatch = useDispatch()
+  const loading = useSelector(selectRemoveItemLoading)
 
   const handleRemove = () => {
     dispatch(removeItem(item.name.toLowerCase()))
   }
+
   return (
     <Row key={item.name}>
       <LeftPanel>
@@ -28,9 +32,13 @@ const Passenger = ({ item, removeAction }) => {
       </LeftPanel>
       <RightPanel>
         <Column>
-          <Button variant={VARIANTS.PRIMARY} onClick={handleRemove}>
-            Eliminar
-          </Button>
+          {loading ? (
+            <LoadingSpinner />
+          ) : (
+            <Button variant={VARIANTS.PRIMARY} onClick={handleRemove}>
+              Eliminar
+            </Button>
+          )}
         </Column>
       </RightPanel>
     </Row>

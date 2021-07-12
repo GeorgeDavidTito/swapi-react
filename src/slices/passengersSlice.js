@@ -1,15 +1,20 @@
-import { createSlice, createSelector } from '@reduxjs/toolkit'
+import { createSlice } from '@reduxjs/toolkit'
 import to from 'await-catch'
 import passengersService from '../services/passengersService'
 
 const INITIAL_STATE = {
   results: null,
-  filter: null,
   nextPage: null,
   currenPage: 0,
   total: 0,
-  loading: false,
-  error: false,
+  loading: {
+    results: false,
+    removeItem: false,
+  },
+  error: {
+    results: false,
+    removeItem: false,
+  },
 }
 
 const slice = createSlice({
@@ -17,21 +22,17 @@ const slice = createSlice({
   initialState: INITIAL_STATE,
   reducers: {
     fetchResultsStart: (state, { payload }) => {
-      state.loading = payload.page > 1 ? false : true
-      state.error = null
+      state.loading.results = payload.page > 1 ? false : true
+      state.error.results = null
     },
     fetchResultsFailed: (state, { payload }) => {
-      state.loading = false
-      state.error = payload
+      state.loading.results = false
+      state.error.results = payload
     },
     fetchResultsSuccess: (state, { payload }) => {
-      state.loading = false
-      state.error = null
+      state.loading.results = false
+      state.error.results = null
       state.results =
-        state.results === null || payload.page === 1
-          ? [...payload.data]
-          : [...state.results, ...payload.data]
-      state.filter =
         state.results === null || payload.page === 1
           ? [...payload.data]
           : [...state.results, ...payload.data]
@@ -39,26 +40,17 @@ const slice = createSlice({
       state.total = payload.total
       state.nextPage = payload.nextPage
     },
-    showFilter: (state, { payload }) => {
-      state.filter = state.results?.filter((passenger) =>
-        passenger?.name?.toLowerCase()?.includes(payload)
-      )
+    removeItemStart: (state) => {
+      state.loading.removeItem = true
     },
-    showAll: (state) => {
-      state.filter = state.results
-    },
-    removeItemStart: () => {},
     removeItemFailed: (state, { payload }) => {
-      state.loading = false
-      state.error = payload
+      state.loading.removeItem = false
+      state.error.removeItem = payload
     },
     removeItemSuccess: (state, { payload }) => {
-      state.loading = false
-      state.error = null
+      state.loading.removeItem = false
+      state.error.removeItem = null
       state.results = state.results?.filter(
-        (passenger) => passenger.name?.toLowerCase() !== payload
-      )
-      state.filter = state.results?.filter(
         (passenger) => passenger.name?.toLowerCase() !== payload
       )
     },
@@ -69,8 +61,6 @@ export const {
   fetchResultsFailed,
   fetchResultsStart,
   fetchResultsSuccess,
-  showFilter,
-  showAll,
   removeItemStart,
   removeItemFailed,
   removeItemSuccess,
@@ -84,7 +74,7 @@ export default slice.reducer
 
 export const fetchPassengers =
   (pageSearch, retry = 2) =>
-  async (dispatch, getState) => {
+  async (dispatch) => {
     const page = pageSearch || 1
 
     dispatch(fetchResultsStart({ page }))
@@ -119,24 +109,15 @@ export const removeItem = (item) => async (dispatch) => {
   }
 }
 
-export const filter = (item) => async (dispatch, getState) => {
-  item !== '' ? dispatch(showFilter(item)) : dispatch(showAll(item))
-}
-
 /**
  * Selectors
  */
 
 export const selectPassengers = (state) => state.passengers.results
-export const selectPassengersFilter = (state) => state.passengers.filter
-export const selectPassengersLoading = (state) => state.passengers.loading
-export const selectPassengersLoadingMore = (state) =>
-  state.passengers.loadingMore
-export const selectPassengersError = (state) => state.passengers.error
-const selectPassengersTotal = (state) => state.passengers.total
-
-export const selectPassengersMoreResults = createSelector(
-  selectPassengers,
-  selectPassengersTotal,
-  (data, total) => data?.length < total
-)
+export const selectPassengersLoading = (state) =>
+  state.passengers.loading.results
+export const selectPassengersError = (state) => state.passengers.error.results
+export const selectRemoveItemLoading = (state) =>
+  state.passengers.loading.removeItem
+export const selectRemoveItemError = (state) =>
+  state.passengers.error.removeItem
